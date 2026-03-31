@@ -1,4 +1,3 @@
 Integrantes:
-
-Leydi Zurita Cuellar 
-Maximiliano Camacho Salazar
+  Leydi Zurita Cuellar 
+  Maximiliano Camacho Salazar
