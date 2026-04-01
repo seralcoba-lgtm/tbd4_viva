@@ -35,7 +35,7 @@ Los siguientes supuestos han sido considerados para el desarrollo del proyecto. 
 | SD3 | Los tipos de recurso (minutos, SMS, datos) son extensibles sin modificar esquema | Nuevos productos requieren cambios estructurales |
 | SD4 | Los registros históricos de consumo no se eliminan, solo se archivan | Pérdida de información para análisis |
 
-
+---
 
 ## 2. Restricciones del Proyecto
 
@@ -77,7 +77,7 @@ Los siguientes supuestos han sido considerados para el desarrollo del proyecto. 
 | RR3 | CPU | Mínimo 16 cores para procesamiento transaccional |
 | RR4 | Personal | 2 DBA, 3 desarrolladores backend |
 
-
+---
 
 ## 3. Dependencias Externas
 
@@ -88,3 +88,24 @@ Los siguientes supuestos han sido considerados para el desarrollo del proyecto. 
 | DE3 | Datos de migración | Datos existentes para validación | Calidad de datos desconocida |
 | DE4 | Switches telefónicos | Integración futura con sistemas de red | Consumos no registrables |
 
+---
+
+## 4. Validación de Supuestos y Restricciones
+
+| Categoría | Responsable | Frecuencia de Validación |
+|-----------|-------------|--------------------------|
+| Supuestos de Negocio | Product Owner | Cada sprint |
+| Supuestos Técnicos | Arquitecto de Datos | Quincenal |
+| Restricciones Técnicas | DBA | Continuo |
+| Dependencias Externas | Project Manager | Semanal |
+
+---
+
+## 5. Riesgos Asociados
+
+| ID | Riesgo | Probabilidad | Impacto | Mitigación |
+|----|--------|--------------|---------|------------|
+| RS1 | Supuesto de concurrencia no válido en producción | Media | Alto | Pruebas de carga con datos reales |
+| RS2 | Cambios en políticas de negocio durante desarrollo | Alta | Medio | Documentación flexible, diseño extensible |
+| RS3 | Disponibilidad limitada de recursos de infraestructura | Baja | Alto | Planificación temprana con TI |
+| RS4 | Integración con switches compleja | Media | Alto | Documentar interfaces con anticipación |
