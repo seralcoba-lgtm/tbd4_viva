@@ -85,5 +85,3 @@ Los siguientes supuestos han sido considerados para el desarrollo del proyecto. 
 | DE2 | Entorno de pruebas | Disponibilidad de servidores para pruebas | Bloqueo de pruebas |
 | DE3 | Datos de migración | Datos existentes para validación | Calidad de datos desconocida |
 | DE4 | Switches telefónicos | Integración futura con sistemas de red | Consumos no registrables |
-
-
