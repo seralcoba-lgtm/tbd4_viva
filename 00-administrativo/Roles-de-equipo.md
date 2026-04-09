@@ -1,4 +1,4 @@
-Modulo de gestion de clientes y lineas 
-Modulo de planes de facturacion (leydi Zurita Cuellar)
-modulo de consumo y servicios (Walter Sergio Alcoba Rodriguez)
-modulo de promociones y financiamientos 
+- Modulo de gestion de clientes y lineas (Osmar Jonatan Soto Mamani)
+- Modulo de planes de facturacion (Leydi Zurita Cuellar)
+- Modulo de consumo y servicios (Walter Sergio Alcoba Rodriguez)
+- Modulo de promociones y financiamientos (Maximiliano Camacho Salazar)
