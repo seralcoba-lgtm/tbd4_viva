@@ -115,4 +115,4 @@
 | RF-001 | Tipos de plan | Individual, Corporativo | ENUM tipo_plan |
 | RF-002 | Plan activo | Solo planes con activo = TRUE pueden ser asignados | Validación |
 | RF-003 | Historial de planes | Cada cambio de plan se registra en LINEA_PLAN | Trigger before update |
-| RF-004 | Plan corporativo compartido | Puede tener pool de recursos para múltiples líneas | Tabla PLAN_CORPORATIV
+| RF-004 | Plan corporativo compartido | Puede tener pool de recursos compartidos entre múltiples líneas de la misma empresa | Tabla PLAN_CORPORATIVO |  
