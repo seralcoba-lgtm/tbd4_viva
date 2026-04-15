@@ -6,63 +6,63 @@
 
 | Elemento | Incluido | Descripción |
 |----------|----------|-------------|
-| Clientes Individuales | ✅ | Registro de datos personales: nombre, documento de identidad, email, dirección |
-| Clientes Corporativos | ✅ | Registro de empresas: razón social, NIT, sector, número de empleados, contacto principal |
-| Antigüedad de Cliente | ✅ | Cálculo automático basado en fecha de registro, influye en elegibilidad de servicios |
-| Múltiples Líneas por Cliente | ✅ | Un cliente puede tener una o varias líneas telefónicas asociadas |
-| Clientes Inactivos | ⚠️ | Solo registro histórico; no se incluye proceso de reactivación en esta fase |
+| Clientes Individuales | SI | Registro de datos personales: nombre, documento de identidad, email, dirección |
+| Clientes Corporativos | SI | Registro de empresas: razón social, NIT, sector, número de empleados, contacto principal |
+| Antigüedad de Cliente | SI | Cálculo automático basado en fecha de registro, influye en elegibilidad de servicios |
+| Múltiples Líneas por Cliente | SI | Un cliente puede tener una o varias líneas telefónicas asociadas |
+| Clientes Inactivos | NO | Solo registro histórico; no se incluye proceso de reactivación en esta fase |
 
 ### 1.2 Gestión de Líneas Telefónicas
 
 | Elemento | Incluido | Descripción |
 |----------|----------|-------------|
-| Registro de Líneas | ✅ | Número telefónico, fecha activación, estado, modalidad (prepago/postpago) |
-| Historial de Planes por Línea | ✅ | Registro de cambios de plan con fechas de inicio y fin |
-| Estado de Línea | ✅ | Activa, Suspendida, Bloqueada, Cancelada |
-| Saldo de Línea Prepago | ✅ | Control de saldo actual y transacciones de recarga |
-| Saldo de Línea Postpago | ⚠️ | Se maneja mediante facturación; crédito consumido se registra |
+| Registro de Líneas | SI | Número telefónico, fecha activación, estado, modalidad (prepago/postpago) |
+| Historial de Planes por Línea | SI | Registro de cambios de plan con fechas de inicio y fin |
+| Estado de Línea | SI | Activa, Suspendida, Bloqueada, Cancelada |
+| Saldo de Línea Prepago | SI | Control de saldo actual y transacciones de recarga |
+| Saldo de Línea Postpago | NO | Se maneja mediante facturación; crédito consumido se registra |
 
 ### 1.3 Gestión de Recursos y Consumos
 
 | Elemento | Incluido | Descripción |
 |----------|----------|-------------|
-| Tipos de Recurso | ✅ | Catálogo extensible: minutos, SMS, datos, roaming, redes sociales, etc. |
-| Consumo de Llamadas | ✅ | Registro de duración, destino, costo, origen del recurso |
-| Consumo de SMS | ✅ | Registro de cantidad, destino, costo, origen del recurso |
-| Consumo de Datos | ✅ | Registro de MB consumidos, destino, costo, origen del recurso |
-| Priorización de Consumo | ✅ | Algoritmo: bonos → paquetes por prioridad → saldo base |
-| Bloqueo de Saldo | ✅ | Para consumos de larga duración (llamadas) |
+| Tipos de Recurso | SI | Catálogo extensible: minutos, SMS, datos, roaming, redes sociales, etc. |
+| Consumo de Llamadas | SI | Registro de duración, destino, costo, origen del recurso |
+| Consumo de SMS | SI | Registro de cantidad, destino, costo, origen del recurso |
+| Consumo de Datos | SI | Registro de MB consumidos, destino, costo, origen del recurso |
+| Priorización de Consumo | SI | Algoritmo: bonos → paquetes por prioridad → saldo base |
+| Bloqueo de Saldo | SI | Para consumos de larga duración (llamadas) |
 
 ### 1.4 Gestión de Paquetes y Promociones
 
 | Elemento | Incluido | Descripción |
 |----------|----------|-------------|
-| Catálogo de Paquetes | ✅ | Definición de paquetes con múltiples componentes de recursos |
-| Composición Flexible | ✅ | Paquetes pueden incluir cualquier combinación de recursos |
-| Compra de Paquetes | ✅ | Registro de adquisición con fecha, vigencia y saldos |
-| Expiración Automática | ✅ | Paquetes expiran automáticamente al superar vigencia |
-| Promociones | ✅ | Definición de promociones con reglas (doble carga, bonos) |
-| Aplicación de Promociones | ✅ | Registro de aplicación de promociones a líneas |
+| Catálogo de Paquetes | SI | Definición de paquetes con múltiples componentes de recursos |
+| Composición Flexible | SI | Paquetes pueden incluir cualquier combinación de recursos |
+| Compra de Paquetes | SI | Registro de adquisición con fecha, vigencia y saldos |
+| Expiración Automática | SI | Paquetes expiran automáticamente al superar vigencia |
+| Promociones | SI | Definición de promociones con reglas (doble carga, bonos) |
+| Aplicación de Promociones | SI | Registro de aplicación de promociones a líneas |
 
 ### 1.5 Gestión de Recargas y Préstamos
 
 | Elemento | Incluido | Descripción |
 |----------|----------|-------------|
-| Recargas Prepago | ✅ | Registro de monto, fecha, medio de recarga, código confirmación |
-| Medios de Recarga | ✅ | Tarjeta física, app móvil, banca digital, puntos de venta |
-| Préstamo de Saldo | ✅ | Solicitud, aprobación, monto, intereses, estado |
-| Elegibilidad de Préstamos | ✅ | Basada en antigüedad del cliente |
-| Pago de Préstamos | ✅ | Registro de pagos parciales o totales |
+| Recargas Prepago | SI | Registro de monto, fecha, medio de recarga, código confirmación |
+| Medios de Recarga | SI | Tarjeta física, app móvil, banca digital, puntos de venta |
+| Préstamo de Saldo | SI | Solicitud, aprobación, monto, intereses, estado |
+| Elegibilidad de Préstamos | SI | Basada en antigüedad del cliente |
+| Pago de Préstamos | SI | Registro de pagos parciales o totales |
 
 ### 1.6 Gestión de Facturación
 
 | Elemento | Incluido | Descripción |
 |----------|----------|-------------|
-| Planes de Servicio | ✅ | Definición de planes individuales y corporativos |
-| Facturación Mensual | ✅ | Generación automática por ciclo de facturación |
-| Consumo Extra | ✅ | Registro de consumo fuera del plan incluido |
-| Planes Corporativos Compartidos | ✅ | Pool de recursos compartido entre múltiples líneas |
-| Historial de Facturas | ✅ | Almacenamiento de facturas emitidas |
+| Planes de Servicio | SI | Definición de planes individuales y corporativos |
+| Facturación Mensual | SI | Generación automática por ciclo de facturación |
+| Consumo Extra | SI | Registro de consumo fuera del plan incluido |
+| Planes Corporativos Compartidos | SI | Pool de recursos compartido entre múltiples líneas |
+| Historial de Facturas | SI | Almacenamiento de facturas emitidas |
 
 ## 2. Alcance No Funcional
 
