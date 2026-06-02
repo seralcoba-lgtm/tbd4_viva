@@ -1,76 +1,47 @@
 
---------------------------------------------------------------------------------
-📂 Escenarios y Casos de Uso de Seguridad
-Esta sección detalla cómo los diferentes roles interactúan con la base de datos Viva bajo las restricciones de seguridad implementadas (RLS, CLS y Vistas Seguras).
-1. Caso de Uso: Atención al Cliente (Operaciones Diarias)
-Actor: employee_role (Personal Operativo).
-Objetivo: Consultar información del cliente para gestionar un reclamo o servicio.
-Control de Seguridad: Seguridad a Nivel de Columna (CLS).
-Interacción Técnica:
-El empleado intenta: SELECT * FROM clientes.cliente;.
-Resultado: ERROR (Permiso Denegado). El sistema bloquea el asterisco porque intenta acceder a la columna protegida doc_identidad (PII)
-.
-El empleado debe ejecutar: SELECT nombre, apellidos, email FROM clientes.cliente;.
-Resultado: ÉXITO. Solo accede a los datos necesarios para la gestión operativa sin exponer el documento de identidad
-.
-2. Caso de Uso: Análisis de Dispositivos (Business Intelligence)
-Actor: analyst_role (Analista de Datos).
-Objetivo: Identificar los modelos de teléfonos más vendidos para un reporte en PowerBI.
-Control de Seguridad: Vistas Seguras con Enmascaramiento.
-Interacción Técnica:
-El analista consulta la vista: SELECT * FROM clientes.vw_dispositivos_seguros;.
-Resultado: El campo imei aparece transformado (ej: ****-****-1234).
-Beneficio: Se permite el análisis de tendencias por marca y modelo sin exponer identificadores únicos de hardware que podrían ser usados de forma maliciosa
-.
-3. Caso de Uso: Auditoría Estratégica de Nómina
-Actor: manager_role (Gerente de Área).
-Objetivo: Revisar los salarios del departamento de ventas para aprobar bonos.
-Control de Seguridad: Privilegios de Supervisión Controlados.
-Interacción Técnica:
-Un usuario real (ej. director_comercial) que hereda de manager_role ejecuta: SELECT nombre, salario FROM rrhh.employee;.
-Resultado: ÉXITO. A diferencia de los otros roles, el gerente tiene visibilidad sobre la columna salario debido a su función estratégica
-.
-Restricción Adicional: Si el gerente intenta ejecutar DELETE FROM rrhh.employee;, el sistema arroja Permiso Denegado, ya que solo el superusuario puede realizar borrados masivos en tablas maestras
-.
-4. Caso de Uso: Privacidad del Empleado (Autogestión)
-Actor: Usuario individual (miembro de employee_role).
-Objetivo: Consultar sus propios datos personales en el esquema de Recursos Humanos.
-Control de Seguridad: Seguridad a Nivel de Fila (RLS).
-Interacción Técnica:
-El empleado "juan_perez" ejecuta: SELECT * FROM rrhh.employee;.
-Resultado Dinámico: El motor de PostgreSQL aplica automáticamente el filtro USING (nombre = current_user). Juan solo ve su propia fila
-.
-Resultado: Si Juan intenta buscar los datos de su jefe, el resultado será de cero filas, garantizando el aislamiento total de datos sensibles entre compañeros
-.
+## 📂 Casos de Uso Basicos
 
---------------------------------------------------------------------------------
-📊 Resumen de Controles por Rol
-Rol
-Esquemas Permitidos
-Restricción Clave
-Herramienta Principal
-employee_role
-Clientes, Ventas, Finanzas
-No ve PII ni saldos iniciales
-CLS Nativo (GRANT selectivo)
-analyst_role
-Clientes, Ventas, Finanzas
-Datos enmascarados/anonimizados
-Vistas Seguras (CREATE VIEW)
-manager_role
-Todos los esquemas
-Visibilidad total, pero sin borrado
-Privilegios de Tabla (TLS)
-rol_lectura
-Todos los esquemas
-No puede insertar ni modificar nada
-Privilegio SELECT Global
+A continuación se detallan situaciones reales del negocio y cómo actúan las barreras de seguridad.
 
---------------------------------------------------------------------------------
-🔍 Verificación de los Casos (Prueba de Fuego)
-Para validar cualquiera de estos casos en el entorno de desarrollo, utiliza el comando de personificación:
+### 1. Caso de Uso: Operaciones de Atención al Cliente
+*   **Actor:** `employee_role`.
+*   **Situación:** Consultar el catálogo de planes comerciales.
+*   **Control:** El empleado tiene permiso `SELECT` en las tablas de `ventas`, pero no puede ver la columna `tarifa_mensual` o `precio` mediante CLS para evitar negociaciones no autorizadas [19, 22, 23].
+*   **Resultado:** El sistema bloquea un `SELECT *` lanzando un error de "Permiso Denegado", obligando al uso de columnas permitidas [24, 25].
+
+### 2. Caso de Uso: Análisis de Tendencias (Business Intelligence)
+*   **Actor:** `analyst_role`.
+*   **Situación:** Generar un reporte de ventas sin exponer datos personales.
+*   **Control:** Uso de **Vistas Seguras**. En lugar de acceder a la tabla base, el analista consulta vistas que enmascaran el **IMEI** o el **Doc_Identidad** [26-28].
+*   **Resultado:** Los reportes en herramientas de BI no fallan, pero los datos sensibles aparecen como `****-****-1234` [29].
+
+### 3. Caso de Uso: Privacidad de Recursos Humanos
+*   **Actor:** Cualquier miembro del `employee_role`.
+*   **Situación:** Intentar consultar el salario de un compañero.
+*   **Control:** Política RLS `USING (nombre = current_user)`. La base de datos reescribe la consulta para que el usuario solo vea su propio registro [20, 30, 31].
+*   **Resultado:** La consulta devuelve cero registros si el usuario intenta filtrar por un tercero, garantizando aislamiento total [32].
+
+---
+
+## 📊 Resumen de Controles por Rol
+
+| Actividad | `employee_role` | `analyst_role` | `manager_role` |
+| :--- | :--- | :--- | :--- |
+| **Acceso a PII** | Bloqueado (CLS) | Enmascarado (View) | Permitido |
+| **Borrados** | Denegado | Denegado | Denegado |
+| **Vistas Seguras** | No requerido | Obligatorio | Opcional |
+| **RLS Activo** | Sí (Self-service) | No (Global) | No (Auditoría) |
+
+---
+
+## 🔍 Verificación (Prueba de Fuego)
+Para validar estas políticas, se utilizan comandos de diagnóstico y personificación de roles [33-35]:
+
+```sql
+-- Verificar matriz de privilegios
+\dp clientes.cliente
+
 -- Simular el comportamiento de un empleado
 SET ROLE employee_role;
-SELECT * FROM clientes.cliente; -- Debería fallar
-SELECT nombre FROM clientes.cliente; -- Debería funcionar
+SELECT * FROM rrhh.employee; -- Debería fallar o filtrar filas
 RESET ROLE;
