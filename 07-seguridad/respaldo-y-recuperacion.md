@@ -102,4 +102,3 @@ Resultado:
 Este respaldo permite recuperar la configuración de usuarios, roles y permisos del servidor PostgreSQL.
 
 ---
-Se implementaron correctamente los mecanismos de respaldo y recuperación mediante la generación de un backup lógico de la base de datos y un respaldo de roles globales. Estas acciones garantizan la disponibilidad de la información y facilitan la recuperación ante posibles fallos o pérdidas de dat
