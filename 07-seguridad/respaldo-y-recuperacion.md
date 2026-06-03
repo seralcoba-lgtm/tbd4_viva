@@ -53,4 +53,56 @@ ORDER BY n_live_tup DESC;"
 ```
 
 Utilizamos la vista interna de estadísticas de PostgreSQL `pg_stat_user_tables`. La columna `n_live_tup` (Number of Live Tuples) guarda el conteo exacto de las filas o registros vivos en cada tabla. Al ordenar esto con `ORDER BY n_live_tup DESC`, se genera un reporte inmediato y auditable de cuántos registros tiene cada tabla.
+# Respaldo y Recuperación
 
+## Backup Lógico de la Base de Datos
+
+Se realizó un respaldo lógico completo de la base de datos Viva mediante la herramienta `pg_dump`.
+
+```bash
+pg_dump -U postgres -Fc Viva -f /tmp/Viva.backup
+```
+
+Verificación realizada:
+
+```bash
+ls -lh /tmp/Viva.backup
+```
+
+Resultado:
+
+```text
+-rw-r--r-- 1 root root 115K Jun 3 14:22 /tmp/Viva.backup
+```
+
+El archivo generado contiene la estructura y los datos de la base de datos.
+
+---
+
+## Backup de Roles Globales
+
+Se realizó el respaldo de usuarios, roles y privilegios utilizando `pg_dumpall`.
+
+```bash
+pg_dumpall -U postgres --globals-only > roles_globales.sql
+```
+
+Verificación realizada:
+
+```bash
+ls -lh roles_globales.sql
+```
+
+Resultado:
+
+```text
+-rw-rw-r-- 1 max max 2.5K Jun 3 14:31 roles_globales.sql
+```
+
+Este respaldo permite recuperar la configuración de usuarios, roles y permisos del servidor PostgreSQL.
+
+---
+
+## Conclusión
+
+Se implementaron correctamente los mecanismos de respaldo y recuperación mediante la generación de un backup lógico de la base de datos y un respaldo de roles globales. Estas acciones garantizan la disponibilidad de la información y facilitan la recuperación ante posibles fallos o pérdidas de datos.
