@@ -107,3 +107,98 @@ SELECT pg_terminate_backend(PID_BLOQUEADOR);
 ```
 
 Una vez identificado el culpable, se utilizó `pg_terminate_backend(PID_BLOQUEADOR)`, que es el equivalente a forzar el cierre de esa sesión conflictiva, resolviendo así el atasco o deadlock y liberando el flujo de trabajo del contenedor.
+
+# Gestión de Sesiones y Monitoreo de PostgreSQL
+
+## Consulta de Sesiones Activas
+
+Para identificar las conexiones activas en la base de datos se utilizó la vista del sistema `pg_stat_activity`.
+
+```sql
+SELECT pid, usename, datname, state, query
+FROM pg_stat_activity;
+```
+
+Esta consulta permitió visualizar los procesos activos, los usuarios conectados y las consultas ejecutadas en la base de datos Viva.
+
+---
+
+## Cancelación de Sesiones
+
+Se realizó la cancelación de una sesión utilizando la función `pg_cancel_backend()`.
+
+```sql
+SELECT pg_cancel_backend(4143);
+```
+
+Resultado obtenido:
+
+```text
+t
+```
+
+La respuesta `t` (true) indica que la consulta asociada a la sesión fue cancelada exitosamente.
+
+---
+
+## Terminación de Sesiones
+
+Se realizó la finalización completa de una sesión mediante la función `pg_terminate_backend()`.
+
+```sql
+SELECT pg_terminate_backend(4143);
+```
+
+Resultado obtenido:
+
+```text
+t
+```
+
+La respuesta `t` (true) confirma que la sesión fue terminada correctamente y eliminada de la lista de conexiones activas.
+
+---
+
+## Activación de pg_stat_statements
+
+Se verificó que el módulo de monitoreo estuviera habilitado.
+
+```sql
+SHOW shared_preload_libraries;
+```
+
+Resultado:
+
+```text
+pg_stat_statements
+```
+
+Esto confirma que PostgreSQL tiene habilitada la extensión necesaria para recopilar estadísticas de ejecución de consultas.
+
+---
+
+## Identificación de Consultas Costosas
+
+Se ejecutó la siguiente consulta:
+
+```sql
+SELECT query,
+       calls,
+       total_exec_time,
+       mean_exec_time
+FROM pg_stat_statements
+ORDER BY total_exec_time DESC
+LIMIT 5;
+```
+
+Resultados obtenidos:
+
+| Consulta                                          | Calls | Tiempo Total (ms) |
+| ------------------------------------------------- | ----- | ----------------- |
+| CREATE DATABASE viva_restore                      | 1     | 31.160266         |
+| CREATE EXTENSION IF NOT EXISTS pg_stat_statements | 1     | 7.535217          |
+| Consulta de índices del catálogo                  | 43    | 4.466104          |
+| Consulta de atributos de tablas                   | 44    | 4.034244          |
+| Consulta de descripciones                         | 1     | 2.976242          |
+
+La consulta con mayor tiempo de ejecución fue `CREATE DATABASE viva_restore`, registrando aproximadamente 31.16 ms.
