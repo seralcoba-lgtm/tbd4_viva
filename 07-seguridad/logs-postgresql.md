@@ -1,4 +1,4 @@
-# Configuración de Logs Nativos en PostgreSQL
+# Configuración de Logs PostgreSQL
 
 ## Objetivo
 
@@ -29,7 +29,6 @@ log_statement = ddl
 
 ## Beneficios
 
-* Registro de conexiones a la base de datos.
-* Seguimiento de operaciones DDL.
-* Apoyo en tareas de auditoría y seguridad.
-
+- Registro de conexiones a la base de datos.
+- Seguimiento de operaciones DDL.
+- Apoyo en tareas de auditoría y seguridad.
