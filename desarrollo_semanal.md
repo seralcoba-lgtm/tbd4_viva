@@ -1668,71 +1668,7 @@ ALTER TABLE clientes.linea_telefonica ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rrhh.employee ENABLE ROW LEVEL SECURITY;
 ```
 
----
-
-# 15. Evidencias recomendadas para GitHub
-
-Se recomienda subir capturas de:
-
-## Semana 1
-
-* `SHOW config_file;`
-* `SHOW hba_file;`
-* Captura de `pg_hba.conf`.
-* Captura de `SHOW listen_addresses;`.
-* Captura de `SHOW password_encryption;`.
-* Captura de `\du`.
-
-## Semana 2
-
-* Captura de `\dv ventas.*`.
-* Captura de `\dv finanzas.*`.
-* Captura de `\dv clientes.*`.
-* Captura de `\dv rrhh.*`.
-* Captura de `pg_policies`.
-* Prueba de usuario limitado.
-* Prueba de usuario gerente.
-* Prueba de RLS.
-
-## Semana 3
-
-* Captura de logs de conexión.
-* Captura de auditoría DML.
-* Captura de consulta lenta.
-* Captura de bloqueo detectado.
-* Captura de `pg_stat_statements`.
-
-## Semana 4
-
-* Captura de backup generado.
-* Captura de restauración exitosa.
-* Captura de validación de tablas, views, roles y policies.
-* Documento final.
-* Presentación ejecutiva.
-
----
-
-# 16. Guion corto para exposición
-
-## Semana 1
-
-En la primera semana se aplicó hardening inicial sobre PostgreSQL. Se revisaron los archivos de configuración `postgresql.conf` y `pg_hba.conf`, se configuró `listen_addresses` para controlar por dónde escucha el servidor y se configuró la autenticación con `scram-sha-256`, que es más segura que métodos como `trust`, `password` o `md5`. También se crearon roles separados por responsabilidad.
-
-## Semana 2
-
-En la segunda semana se implementó control de acceso y seguridad por objeto. Se trabajó con esquemas separados por área, views seguras y políticas RLS. Las views permiten proteger columnas sensibles y las policies controlan qué filas puede ver cada rol. Por ejemplo, los empleados solo ven planes activos, promociones vigentes o facturas recientes, mientras que los gerentes tienen acceso más amplio.
-
-## Semana 3
-
-En la tercera semana se implementó auditoría y monitoreo. Se configuraron logs de conexión y operaciones DDL, se creó una tabla de auditoría para registrar operaciones DML como INSERT, UPDATE y DELETE, y se utilizaron consultas del sistema para detectar sesiones lentas y bloqueos. También se activó `pg_stat_statements` para identificar las consultas más costosas.
-
-## Semana 4
-
-En la cuarta semana se implementó backup y recuperación. Se generaron respaldos con `pg_dump`, se guardaron roles con `pg_dumpall --globals-only` y se validó la restauración en una base de prueba. Finalmente, se documentó la arquitectura de seguridad, la matriz de roles, las policies, la auditoría y la estrategia de recuperación con RPO y RTO definidos.
-
----
-
-# 17. Conclusión
+# 15. Conclusión
 
 El proyecto implementa una arquitectura de seguridad por capas en PostgreSQL. Se protegió el acceso al servidor mediante `listen_addresses`, `pg_hba.conf` y `scram-sha-256`. Se aplicó control de permisos mediante roles y esquemas. Se protegieron datos sensibles con views y se aplicó seguridad a nivel de filas con RLS. Además, se incorporó auditoría, monitoreo y una estrategia de backup y recuperación.
 
