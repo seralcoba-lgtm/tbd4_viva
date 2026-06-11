@@ -2,9 +2,7 @@
 
 ## Recovery Point Objective (RPO)
 
-Valor definido:
-
-15 minutos
+Valor definido: 15 minutos
 
 ### Interpretación
 
@@ -14,9 +12,7 @@ En caso de incidente, la organización acepta perder como máximo los datos gene
 
 ## Recovery Time Objective (RTO)
 
-Valor definido:
-
-60 minutos
+Valor definido: 60 minutos
 
 ### Interpretación
 
