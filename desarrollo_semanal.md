@@ -1424,7 +1424,7 @@ docker exec -i postgres17-recuperado psql -U postgres -d Viva_restore < backups/
 
 ---
 
-## 10.5 Restauración desde formato custom
+## 10.5 Estrategia de Respaldo y Recuperacion
 
 Copiar backup al contenedor:
 
