@@ -14,74 +14,200 @@ PostgreSQL 17.10
 
 Docker
 
-## Auditoría Implementada
+### Base de Datos
 
-### Logs Nativos
+Viva
 
-Configuración aplicada:
+---
+
+# Auditoría Implementada
+
+## Logs Nativos
+
+Se configuró PostgreSQL para registrar conexiones y eventos relevantes mediante los mecanismos nativos de logging.
+
+### Configuración aplicada
 
 ```sql
 SHOW log_connections;
 SHOW log_statement;
+SHOW logging_collector;
 ```
 
-Resultado:
+### Resultado
 
 ```text
 log_connections = on
 log_statement = ddl
+logging_collector = on
 ```
 
-### pgAudit
+La configuración permite registrar conexiones a la base de datos, cambios estructurales y almacenar físicamente los eventos en archivos de log.
 
-Configurado mediante:
+---
 
-```text
-shared_preload_libraries = 'pg_stat_statements,pgaudit'
-```
+## Auditoría mediante pgAudit
 
-Extensión instalada:
+Se implementó la extensión pgAudit para fortalecer el registro de actividades realizadas sobre la base de datos.
+
+### Verificación de la extensión
 
 ```sql
-CREATE EXTENSION pgaudit;
+SELECT extname
+FROM pg_extension
+WHERE extname='pgaudit';
 ```
 
-### Auditoría DML
+### Resultado
 
-Implementación:
+```text
+pgaudit
+```
 
-- Tabla auditoria_dml.
-- Función fn_auditoria_dml().
-- Trigger trg_auditoria_cliente.
+### Configuración
 
-Operaciones auditadas:
+```sql
+SHOW pgaudit.log;
+```
 
-- INSERT
-- UPDATE
-- DELETE
+### Resultado
 
-## Recuperación y Respaldo
+```text
+read, write, ddl, role
+```
 
-### PITR
+La configuración permite auditar:
 
-Configurado mediante:
+* Operaciones de lectura (SELECT)
+* Operaciones de escritura (INSERT, UPDATE y DELETE)
+* Operaciones DDL (CREATE, ALTER y DROP)
+* Gestión de roles y privilegios
 
-- wal_level = replica
-- archive_mode = on
-- archive_command configurado
+---
 
-### Política de Respaldo
+## Auditoría DML
 
-- Respaldo completo semanal.
-- Archivado continuo de WAL.
+Se implementó un mecanismo de auditoría mediante triggers para registrar cambios realizados sobre tablas críticas del sistema.
 
-### RPO y RTO
+### Componentes Implementados
 
-- RPO: 15 minutos
-- RTO: 60 minutos
+* Tabla: auditoria.auditoria_dml
+* Trigger: trg_auditoria_cliente
+* Trigger: trg_auditoria_dml_recarga
+* Almacenamiento de cambios mediante JSONB
 
-## Conclusiones
+### Operaciones Auditadas
 
-Se implementaron mecanismos de auditoría, trazabilidad y recuperación de información utilizando herramientas nativas de PostgreSQL y la extensión pgAudit.
+* INSERT
+* UPDATE
+* DELETE
 
-Las pruebas realizadas demostraron el correcto funcionamiento de la auditoría DML y la generación de archivos WAL necesarios para recuperación PITR.
+### Información Registrada
+
+* Usuario de base de datos
+* Fecha y hora del evento
+* Tabla afectada
+* Tipo de operación
+* Datos anteriores
+* Datos nuevos
+
+La implementación utiliza las funciones:
+
+```sql
+to_jsonb(OLD)
+to_jsonb(NEW)
+```
+
+permitiendo conservar el estado previo y posterior de cada modificación.
+
+---
+
+## Auditoría DDL
+
+Se implementó auditoría estructural mediante Event Triggers para registrar modificaciones realizadas sobre objetos de la base de datos.
+
+### Event Triggers Activos
+
+* trg_audit_ddl
+* pgaudit_ddl_command_end
+* pgaudit_sql_drop
+
+Estos mecanismos permiten registrar eventos CREATE, ALTER y DROP ejecutados sobre la base de datos.
+
+---
+
+# Monitoreo
+
+Se utilizaron herramientas nativas de PostgreSQL para monitorear actividad, rendimiento y bloqueos.
+
+### Herramientas utilizadas
+
+* pg_stat_activity
+* pg_stat_statements
+* pg_blocking_pids()
+
+### Capacidades implementadas
+
+* Identificación de consultas lentas.
+* Monitoreo de sesiones activas.
+* Detección de bloqueos.
+* Identificación de consultas costosas.
+* Gestión y terminación de sesiones.
+
+---
+
+# Recuperación y Respaldo
+
+## PITR (Point In Time Recovery)
+
+Se implementó recuperación a un punto específico en el tiempo utilizando WAL (Write Ahead Log).
+
+### Configuración utilizada
+
+```text
+wal_level = replica
+archive_mode = on
+archive_command configurado
+```
+
+Esta configuración permite reconstruir el estado de la base de datos hasta un instante específico mediante la aplicación secuencial de archivos WAL.
+
+---
+
+## Política de Respaldo
+
+La estrategia de respaldo contempla:
+
+* Respaldo completo semanal.
+* Archivado continuo de WAL.
+* Almacenamiento persistente de respaldos.
+* Procedimientos de recuperación documentados.
+
+---
+
+# Objetivos de Recuperación
+
+## RPO (Recovery Point Objective)
+
+15 minutos.
+
+Representa la pérdida máxima aceptable de información en caso de incidente.
+
+## RTO (Recovery Time Objective)
+
+60 minutos.
+
+Representa el tiempo máximo estimado para restaurar completamente el servicio.
+
+---
+
+# Resultados Obtenidos
+
+* Implementación de auditoría nativa mediante logs PostgreSQL.
+* Implementación de auditoría avanzada mediante pgAudit.
+* Implementación de auditoría DML con triggers y JSONB.
+* Implementación de auditoría DDL mediante Event Triggers.
+* Monitoreo de rendimiento y sesiones activas.
+* Detección y resolución de bloqueos.
+* Configuración de recuperación PITR mediante WAL.
+* Definición de políticas de respaldo y objetivos de recuperación.
