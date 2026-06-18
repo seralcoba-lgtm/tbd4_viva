@@ -1,0 +1,146 @@
+# Arquitectura de Seguridad
+
+## Objetivo
+
+Implementar una arquitectura de seguridad para la base de datos Viva sobre PostgreSQL 17, garantizando la confidencialidad, integridad, disponibilidad y trazabilidad de la información mediante mecanismos de control de acceso, auditoría, monitoreo, respaldo y recuperación.
+
+---
+
+## Componentes de la Arquitectura
+
+### Infraestructura
+
+* Sistema Operativo: Debian GNU/Linux
+* Plataforma de Contenedores: Docker
+* Motor de Base de Datos: PostgreSQL 17.10
+* Base de Datos: Viva
+
+---
+
+## Capas de Seguridad Implementadas
+
+### Seguridad de Acceso
+
+Se implementó control de acceso mediante roles separados por dominio funcional:
+
+* admin_clientes
+* admin_finanzas
+* admin_rrhh
+* admin_ventas
+* postgres
+
+Cada rol posee privilegios específicos sobre los esquemas y objetos asignados.
+
+---
+
+### Seguridad por Esquemas
+
+La base de datos fue segmentada en esquemas independientes:
+
+* clientes
+* finanzas
+* rrhh
+* ventas
+* auditoria
+
+Esta separación reduce la superficie de exposición y permite aplicar privilegios granulares.
+
+---
+
+### Auditoría de Actividades
+
+Se implementaron tres niveles de auditoría:
+
+#### Auditoría DML
+
+Mediante triggers que registran:
+
+* INSERT
+* UPDATE
+* DELETE
+
+Los cambios son almacenados en:
+
+```text
+auditoria.auditoria_dml
+```
+
+utilizando JSONB para conservar valores anteriores y nuevos.
+
+#### Auditoría DDL
+
+Mediante Event Triggers que registran cambios estructurales sobre objetos de la base de datos.
+
+#### Auditoría Avanzada
+
+Mediante pgAudit configurado para registrar:
+
+```text
+read, write, ddl, role
+```
+
+---
+
+### Monitoreo
+
+Se implementó monitoreo utilizando:
+
+* pg_stat_activity
+* pg_stat_statements
+* Logs nativos PostgreSQL
+
+permitiendo detectar:
+
+* consultas lentas
+* sesiones activas
+* bloqueos
+* operaciones críticas
+
+---
+
+### Respaldo y Recuperación
+
+La estrategia de continuidad incluye:
+
+* Backups completos
+* Archivado WAL
+* Recuperación PITR
+* Definición de RPO y RTO
+
+---
+
+## Diagrama General
+
+```text
+Usuarios
+    │
+    ▼
+Roles PostgreSQL
+    │
+    ▼
+Esquemas Seguros
+(clientes, finanzas, rrhh, ventas)
+    │
+    ├── Auditoría DML
+    │
+    ├── Auditoría DDL
+    │
+    └── pgAudit
+            │
+            ▼
+     Logs PostgreSQL
+            │
+            ▼
+ Backups + WAL + PITR
+```
+
+---
+
+## Beneficios de la Arquitectura
+
+* Separación de responsabilidades.
+* Control granular de privilegios.
+* Trazabilidad completa de operaciones.
+* Monitoreo continuo de actividades.
+* Recuperación ante incidentes.
+* Protección de la información crítica del sistema.
