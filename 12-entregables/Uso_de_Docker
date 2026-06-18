@@ -1,0 +1,90 @@
+# Uso de Docker
+
+## Objetivo
+
+Implementar la infraestructura de la base de datos utilizando contenedores Docker para facilitar el despliegue, administración, aislamiento y portabilidad de los servicios.
+
+---
+
+# Arquitectura Implementada
+
+La solución fue desplegada mediante Docker utilizando contenedores independientes para los servicios requeridos por el proyecto.
+
+Componentes utilizados:
+
+* PostgreSQL 17
+* Herramientas de monitoreo y administración
+* Volúmenes persistentes para almacenamiento de datos
+
+---
+
+# Contenedor de Base de Datos
+
+La base de datos Viva fue ejecutada dentro de un contenedor Docker basado en la imagen oficial de PostgreSQL 17.
+
+Verificación realizada:
+
+```bash
+sudo docker ps
+```
+
+Resultado:
+
+```text
+CONTAINER ID   IMAGE         STATUS
+412a7a33251a   postgres:17   Up
+```
+
+Esto confirma que PostgreSQL se encuentra ejecutándose dentro de un contenedor aislado.
+
+---
+
+# Administración del Contenedor
+
+Ingreso al contenedor:
+
+```bash
+sudo docker exec -it postgres-viva bash
+```
+
+Ingreso directo a PostgreSQL:
+
+```bash
+sudo docker exec -it postgres-viva psql -U postgres -d Viva
+```
+
+Estas operaciones permitieron administrar la base de datos sin necesidad de instalar PostgreSQL directamente sobre el sistema operativo anfitrión.
+
+---
+
+# Persistencia de Datos
+
+La información de la base de datos se almacena en volúmenes persistentes de Docker.
+
+Esto garantiza que los datos permanezcan disponibles incluso después de reiniciar o recrear el contenedor.
+
+---
+
+# Beneficios Obtenidos
+
+## Aislamiento
+
+Los servicios operan de forma independiente del sistema operativo anfitrión.
+
+## Portabilidad
+
+La solución puede desplegarse en diferentes entornos manteniendo la misma configuración.
+
+## Escalabilidad
+
+Permite incorporar nuevos servicios y herramientas de monitoreo sin afectar la base de datos principal.
+
+## Facilidad de Administración
+
+Las tareas de respaldo, recuperación, actualización y monitoreo pueden realizarse directamente sobre los contenedores.
+
+---
+
+# Conclusión
+
+El uso de Docker permitió desplegar PostgreSQL 17 de forma segura, portable y fácilmente administrable, facilitando la implementación de auditoría, monitoreo, respaldo y recuperación dentro del proyecto Viva.
