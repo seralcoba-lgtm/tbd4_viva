@@ -1,90 +1,232 @@
 ## Implementación de Auditoría Estructural (Event Trigger DDL)
 
-**Objetivo:** Registrar de manera automática cualquier modificación en la estructura de la base de datos (creación, alteración o eliminación de tablas) para identificar qué usuario realizó el cambio y en qué momento.
+### Objetivo
 
-**Procedimiento:**
+Registrar de manera automática cualquier modificación en la estructura de la base de datos (creación, alteración o eliminación de objetos) para identificar qué usuario realizó el cambio y en qué momento.
 
-1. Ingresar a la consola interactiva de la base de datos Viva:
+### Procedimiento
 
-```bash
-docker exec -it postgres17-recuperado psql -U postgres -d Viva
-```
-
-2. Crear la tabla de bitácora para almacenar los logs de auditoría:
+Se verificó la existencia de los Event Triggers implementados para auditoría estructural mediante la siguiente consulta:
 
 ```sql
-CREATE TABLE public.log_auditoria_ddl (
-    id SERIAL PRIMARY KEY,
-    usuario TEXT DEFAULT current_user,
-    fecha TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    tag_comando TEXT,
-    tipo_objeto TEXT,
-    nombre_objeto TEXT
-);
+SELECT evtname,
+       evtevent,
+       evtenabled
+FROM pg_event_trigger;
 ```
 
-Creamos la tabla `log_auditoria_ddl` para que sirviera como un libro de registro (bitácora).
+Resultado obtenido:
 
-3. Crear la función recolectora de eventos:
+```text
+trg_audit_ddl           | ddl_command_end | O
+pgaudit_ddl_command_end | ddl_command_end | O
+pgaudit_sql_drop        | sql_drop        | O
+```
+
+La implementación utiliza Event Triggers para capturar automáticamente los cambios estructurales realizados en la base de datos. Cuando un usuario ejecuta operaciones DDL como CREATE, ALTER o DROP, PostgreSQL registra estos eventos y los almacena en la tabla de auditoría estructural correspondiente.
+
+---
+
+## Auditoría mediante pgAudit
+
+### Objetivo
+
+Registrar actividades de lectura, escritura, modificaciones estructurales y administración de roles utilizando la extensión pgAudit integrada con PostgreSQL.
+
+### Verificación de la extensión
 
 ```sql
-CREATE OR REPLACE FUNCTION public.funcion_auditar_ddl()
-RETURNS event_trigger AS $$
-DECLARE
-    r RECORD;
-BEGIN
-    FOR r IN SELECT * FROM pg_event_trigger_ddl_commands() LOOP
-        INSERT INTO public.log_auditoria_ddl (tag_comando, tipo_objeto, nombre_objeto)
-        VALUES (tg_tag, r.object_type, r.object_identity);
-    END LOOP;
-END;
-$$ LANGUAGE plpgsql;
+SELECT extname
+FROM pg_extension
+WHERE extname='pgaudit';
 ```
 
-El código `CREATE EVENT TRIGGER ... ON ddl_command_end` instruyó a PostgreSQL 17 para que se quede esperando a que cualquier usuario ejecute un comando estructural. Al terminar (`_end`) de ejecutarse el comando, el trigger llama a nuestra función. La función usa la herramienta interna `pg_event_trigger_ddl_commands()` para capturar exactamente quién hizo el cambio, qué tipo de objeto afectó y lo inserta en nuestra tabla de log.
+Resultado obtenido:
 
-4. Vincular la función a un Trigger de Evento (Event Trigger):
+```text
+pgaudit
+```
+
+La consulta confirma que la extensión pgAudit se encuentra instalada y disponible en la base de datos.
+
+### Configuración de Auditoría
 
 ```sql
-CREATE EVENT TRIGGER trigger_auditoria_ddl
-ON ddl_command_end
-EXECUTE FUNCTION public.funcion_auditar_ddl();
+SHOW pgaudit.log;
 ```
+
+Resultado obtenido:
+
+```text
+read, write, ddl, role
+```
+
+Esta configuración permite auditar:
+
+* Operaciones de lectura (SELECT)
+* Operaciones de escritura (INSERT, UPDATE, DELETE)
+* Cambios estructurales (CREATE, ALTER, DROP)
+* Gestión de roles y privilegios
+
+### Verificación de Logs Nativos
+
+```sql
+SELECT name, setting
+FROM pg_settings
+WHERE name IN ('log_connections','log_statement');
+```
+
+Resultado obtenido:
+
+```text
+log_connections | on
+log_statement   | ddl
+```
+
+La configuración habilita el registro de conexiones a la base de datos y los cambios estructurales ejecutados sobre los objetos de PostgreSQL.
+
+### Verificación de Almacenamiento de Logs
+
+```sql
+SHOW logging_collector;
+```
+
+Resultado obtenido:
+
+```text
+on
+```
+
+La activación de logging_collector permite almacenar físicamente los registros generados por PostgreSQL y pgAudit.
+
+### Evidencia de Archivos de Log
+
+```sql
+SELECT *
+FROM pg_ls_logdir();
+```
+
+Resultado obtenido:
+
+```text
+postgresql-2026-06-18_014322.log
+```
+
+La existencia de archivos de log confirma que PostgreSQL está almacenando los eventos auditados en archivos físicos para su posterior análisis.
+
+---
+
+## Implementación de Auditoría DML mediante Triggers
+
+### Objetivo
+
+Registrar automáticamente las operaciones INSERT, UPDATE y DELETE realizadas sobre las tablas auditadas, conservando tanto los datos anteriores como los nuevos valores.
+
+### Verificación del Trigger de Auditoría
+
+```sql
+SELECT trigger_name,
+       event_manipulation,
+       event_object_table
+FROM information_schema.triggers
+WHERE event_object_table = 'recarga';
+```
+
+Resultado obtenido:
+
+```text
+trg_auditoria_dml_recarga | INSERT | recarga
+trg_auditoria_dml_recarga | UPDATE | recarga
+trg_auditoria_dml_recarga | DELETE | recarga
+```
+
+El trigger registra automáticamente todas las operaciones DML ejecutadas sobre la tabla finanzas.recarga.
+
+### Evidencia de Eventos Auditados
+
+```sql
+SELECT id_auditoria,
+       nombre_tabla,
+       tipo_operacion,
+       usuario_bd,
+       fecha_evento
+FROM auditoria.auditoria_dml
+ORDER BY id_auditoria DESC;
+```
+
+Los registros almacenados muestran el usuario responsable, la fecha del evento, la tabla afectada y el tipo de operación realizada.
+
+### Uso de JSONB para Registrar Cambios
+
+```sql
+SELECT
+    datos_anteriores,
+    datos_nuevos
+FROM auditoria.auditoria_dml
+WHERE tipo_operacion='UPDATE'
+ORDER BY id_auditoria DESC
+LIMIT 1;
+```
+
+La implementación utiliza las funciones:
+
+```sql
+to_jsonb(OLD)
+to_jsonb(NEW)
+```
+
+permitiendo almacenar en formato JSONB el estado anterior y posterior de cada registro modificado.
+
+De esta manera es posible reconstruir completamente cualquier cambio realizado sobre los datos auditados.
+
+---
 
 ## Monitoreo de Rendimiento
 
-**Objetivo:** Identificar consultas lentas que degradan el rendimiento del servidor, haciendo un cálculo matemático con el tiempo.
+### Objetivo
 
-**Procedimiento:**
+Identificar consultas lentas que puedan afectar el rendimiento del servidor mediante el cálculo del tiempo de ejecución.
 
-- Identificar consultas lentas (más de 5 segundos de ejecución):
+### Procedimiento
 
 ```sql
 SELECT
     pid,
-    user,
+    usename,
     now() - query_start AS duracion,
     query,
     state
 FROM pg_stat_activity
-WHERE state != 'idle'
+WHERE state <> 'idle'
   AND (now() - query_start) > interval '5 seconds'
 ORDER BY duracion DESC;
 ```
 
-En nuestro script usamos la fórmula `now() - query_start`. Esto resta la hora actual (`now()`) menos la hora en que empezó la consulta, dándonos la duración exacta de ejecución.
+La expresión:
 
-Filtramos usando `WHERE state != 'idle'`, lo que descarta a los usuarios que están conectados pero no están haciendo nada.
+```sql
+now() - query_start
+```
 
-Añadimos la condición `> interval '5 seconds'`, cumpliendo la directiva de atrapar específicamente a las sesiones "lentas" (aquellas atascadas procesando durante más de 5 segundos).
+permite calcular el tiempo exacto de ejecución de una consulta activa.
+
+Se utiliza:
+
+```sql
+state <> 'idle'
+```
+
+para excluir conexiones inactivas y concentrar el análisis únicamente en procesos que se encuentran ejecutando operaciones.
+
+---
 
 ## Monitoreo y Resolución de Bloqueos (Deadlocks)
 
-**Objetivo:** Detectar/eliminar bloqueos entre transacciones que congelan la aplicación. Identificar la raíz de estos embotellamientos usando una función específica de PostgreSQL.
+### Objetivo
 
-**Procedimiento:**
+Detectar sesiones bloqueadas e identificar el origen de los bloqueos que afectan el funcionamiento de la aplicación.
 
-1. Detectar bloqueos (Deadlocks):
+### Detección de Bloqueos
 
 ```sql
 SELECT
@@ -96,90 +238,76 @@ FROM pg_stat_activity
 WHERE cardinality(pg_blocking_pids(pid)) > 0;
 ```
 
-Utilizamos la función `pg_blocking_pids(pid)` en nuestra consulta de monitoreo. Esta es una función nativa de Postgres que, al pasarle el ID del proceso (PID) de un usuario que está esperando, te devuelve una lista de los PIDs de los usuarios que lo están bloqueando.
-
-Al filtrar con `WHERE cardinality(pg_blocking_pids(pid)) > 0`, obligamos a la base de datos a mostrarnos únicamente a las víctimas del bloqueo y a sus culpables.
-
-2. Resolver bloqueos (matar el proceso problemático): Reemplazar `PID_BLOQUEADOR` por el número de proceso identificado en la consulta anterior.
+La función:
 
 ```sql
-SELECT pg_terminate_backend(PID_BLOQUEADOR);
+pg_blocking_pids(pid)
 ```
 
-Una vez identificado el culpable, se utilizó `pg_terminate_backend(PID_BLOQUEADOR)`, que es el equivalente a forzar el cierre de esa sesión conflictiva, resolviendo así el atasco o deadlock y liberando el flujo de trabajo del contenedor.
+permite identificar qué procesos están bloqueando a otros procesos activos dentro de PostgreSQL.
 
-# Gestión de Sesiones y Monitoreo de PostgreSQL
-
-## Consulta de Sesiones Activas
-
-Para identificar las conexiones activas en la base de datos se utilizó la vista del sistema `pg_stat_activity`.
+### Resolución de Bloqueos
 
 ```sql
-SELECT pid, usename, datname, state, query
+SELECT pg_terminate_backend(<PID>);
+```
+
+Donde `<PID>` corresponde al proceso identificado como responsable del bloqueo.
+
+La terminación del proceso libera los recursos bloqueados y restablece el funcionamiento normal de la aplicación.
+
+---
+
+## Gestión de Sesiones y Monitoreo de PostgreSQL
+
+### Consulta de Sesiones Activas
+
+```sql
+SELECT pid,
+       usename,
+       datname,
+       state,
+       query
 FROM pg_stat_activity;
 ```
 
-Esta consulta permitió visualizar los procesos activos, los usuarios conectados y las consultas ejecutadas en la base de datos Viva.
+Esta consulta permite visualizar usuarios conectados, estado de las sesiones y consultas ejecutadas en la base de datos.
 
----
-
-## Cancelación de Sesiones
-
-Se realizó la cancelación de una sesión utilizando la función `pg_cancel_backend()`.
+### Cancelación de Sesiones
 
 ```sql
-SELECT pg_cancel_backend(4143);
+SELECT pg_cancel_backend(<PID>);
 ```
 
-Resultado obtenido:
+La función cancela la consulta en ejecución manteniendo activa la conexión del usuario.
 
-```text
-t
-```
-
-La respuesta `t` (true) indica que la consulta asociada a la sesión fue cancelada exitosamente.
-
----
-
-## Terminación de Sesiones
-
-Se realizó la finalización completa de una sesión mediante la función `pg_terminate_backend()`.
+### Terminación de Sesiones
 
 ```sql
-SELECT pg_terminate_backend(4143);
+SELECT pg_terminate_backend(<PID>);
 ```
 
-Resultado obtenido:
-
-```text
-t
-```
-
-La respuesta `t` (true) confirma que la sesión fue terminada correctamente y eliminada de la lista de conexiones activas.
+La función finaliza completamente la sesión seleccionada y libera todos los recursos asociados.
 
 ---
 
 ## Activación de pg_stat_statements
 
-Se verificó que el módulo de monitoreo estuviera habilitado.
+### Verificación
 
 ```sql
 SHOW shared_preload_libraries;
 ```
 
-Resultado:
+Resultado obtenido:
 
 ```text
-pg_stat_statements
+pgaudit, pg_stat_statements
 ```
 
-Esto confirma que PostgreSQL tiene habilitada la extensión necesaria para recopilar estadísticas de ejecución de consultas.
+Este resultado confirma que PostgreSQL tiene habilitadas las extensiones necesarias para auditoría y monitoreo de consultas.
 
----
-
-## Identificación de Consultas Costosas
-
-Se ejecutó la siguiente consulta:
+### Identificación de Consultas Costosas
 
 ```sql
 SELECT query,
@@ -191,14 +319,4 @@ ORDER BY total_exec_time DESC
 LIMIT 5;
 ```
 
-Resultados obtenidos:
-
-| Consulta                                          | Calls | Tiempo Total (ms) |
-| ------------------------------------------------- | ----- | ----------------- |
-| CREATE DATABASE viva_restore                      | 1     | 31.160266         |
-| CREATE EXTENSION IF NOT EXISTS pg_stat_statements | 1     | 7.535217          |
-| Consulta de índices del catálogo                  | 43    | 4.466104          |
-| Consulta de atributos de tablas                   | 44    | 4.034244          |
-| Consulta de descripciones                         | 1     | 2.976242          |
-
-La consulta con mayor tiempo de ejecución fue `CREATE DATABASE viva_restore`, registrando aproximadamente 31.16 ms.
+La vista pg_stat_statements permite identificar las consultas que consumen mayor tiempo de ejecución y facilita la optimización del rendimiento del sistema.
