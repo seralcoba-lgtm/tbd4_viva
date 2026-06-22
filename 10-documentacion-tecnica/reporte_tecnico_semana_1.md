@@ -47,8 +47,8 @@ Con esta configuración, PostgreSQL solo acepta conexiones desde la misma máqui
 ### Evidencia
 
 
-![Configuración de listen_addresses](imagenes/Captura%20de%20pantalla%202026-06-21%20222833.png)
-![Configuración de listen\_addresses](imagenes/Captura%20de%20pantalla%202026-06-22%20173744.png)
+![Configuración de listen_addresses](./imagenes/Captura%20de%20pantalla%202026-06-21%20222833.png)
+![Configuración de listen\_addresses](./imagenes/Captura%20de%20pantalla%202026-06-22%20173744.png)
 
 ### Justificación
 
@@ -124,8 +124,8 @@ host    replication     all             ::1/128                 scram-sha-256
 
 ### Evidencia
 
-![Configuración de listen\_addresses](imagenes/Captura%20de%20pantalla%202026-06-21%20223050.png)
-![Configuración de listen\_addresses](imagenes/Captura%20de%20pantalla%202026-06-22%20173929.png)
+![Configuración de listen\_addresses](./imagenes/Captura%20de%20pantalla%202026-06-21%20223050.png)
+![Configuración de listen\_addresses](./imagenes/Captura%20de%20pantalla%202026-06-22%20173929.png)
 
 
 
@@ -182,7 +182,7 @@ ORDER BY usuario.rolname;
 
 ### Evidencia
 
-![Membresía de usuarios y roles](![Listado de roles con \du+](imagenes/Captura%20de%20pantalla%202026-06-22%20180443.png))
+![Membresía de usuarios y roles](![Listado de roles con \du+](./imagenes/Captura%20de%20pantalla%202026-06-22%20180443.png))
 
 ---
 
@@ -221,7 +221,7 @@ Consulta utilizada:
 \du+
 ```
 
-![Listado de roles con \du+](imagenes/Captura%20de%20pantalla%202026-06-22%20180828.png)
+![Listado de roles con \du+](./imagenes/Captura%20de%20pantalla%202026-06-22%20180828.png)
 
 Consulta utilizada:
 
@@ -231,7 +231,7 @@ FROM pg_roles
 WHERE rolname NOT LIKE 'pg_%';
 ```
 
-![Privilegios globales de roles](imagenes/Captura%20de%20pantalla%202026-06-22%20180902.png)
+![Privilegios globales de roles](./imagenes/Captura%20de%20pantalla%202026-06-22%20180902.png)
 
 ### Análisis de mínimo privilegio
 
@@ -308,7 +308,7 @@ public  | {pg_database_owner=UC/pg_database_owner,laravel_gui=U/pg_database_owne
 
 ### Evidencia
 
-![Revocación de permisos públicos](imagenes/Captura%20de%20pantalla%202026-06-22%20180958.png)
+![Revocación de permisos públicos](./imagenes/Captura%20de%20pantalla%202026-06-22%20180958.png)
 
 ### Prueba recomendada con usuario limitado
 
@@ -334,7 +334,7 @@ ERROR: permission denied for schema public
 
 ### Evidencia de prueba con usuario limitado
 
-![Usuario limitado sin permiso en public](imagenes/Captura%20de%20pantalla%202026-06-22%20181053.png)
+![Usuario limitado sin permiso en public](./imagenes/Captura%20de%20pantalla%202026-06-22%20181053.png)
 
 ---
 
@@ -376,7 +376,7 @@ ERROR: permission denied to create database
 
 ### Evidencia
 
-![Conexión con usuario limitado](imagenes/Captura%20de%20pantalla%202026-06-22%20182705.png)
+![Conexión con usuario limitado](./imagenes/Captura%20de%20pantalla%202026-06-22%20182705.png)
 
 ---
 
