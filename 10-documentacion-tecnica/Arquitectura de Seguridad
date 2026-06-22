@@ -43,7 +43,6 @@ La base de datos fue segmentada en esquemas independientes:
 * ventas
 * auditoria
 
-Esta separación reduce la superficie de exposición y permite aplicar privilegios granulares.
 
 ---
 
