@@ -254,13 +254,7 @@ SELECT salario
 FROM rrhh.employee;
 ```
 
----
 
-## Evidencia de configuración
-
-![Configuración de seguridad por columna](imagenes/semana2_seguridad_columna_grant.png)
-
----
 
 ## Prueba funcional con usuario limitado
 
@@ -294,7 +288,7 @@ o un error de permiso relacionado con la columna restringida.
 
 ## Evidencia
 
-![Prueba de restricción por columna](imagenes/semana2_seguridad_columna_prueba.png)
+![Prueba de restricción por columna](./imagenes/Captura%20de%20pantalla%202026-06-22%20193658.png)
 
 ---
 
@@ -354,7 +348,7 @@ ORDER BY schemaname, tablename, policyname;
 
 ## Evidencia
 
-![Políticas RLS configuradas](imagenes/semana2_rls_policies.png)
+![Políticas RLS configuradas](./imagenes/Captura%20de%20pantalla%202026-06-22%20193801.png)
 
 ---
 
@@ -399,7 +393,7 @@ WHERE usuario IN ('empleado_306', 'empleado_307');
 
 ## Evidencia
 
-![Asignación de líneas por usuario](imagenes/semana2_usuario_linea.png)
+![Asignación de líneas por usuario](./imagenes/Captura%20de%20pantalla%202026-06-22%20194342.png)
 
 ---
 
@@ -424,7 +418,7 @@ LIMIT 10;
 
 ## Evidencia
 
-![RLS con empleado\_306](imagenes/semana2_rls_empleado306.png)
+![RLS con empleado\_306](./imagenes/Captura%20de%20pantalla%202026-06-22%20194540.png)
 
 ---
 
@@ -449,7 +443,7 @@ LIMIT 10;
 
 ## Evidencia
 
-![RLS con empleado\_307](imagenes/semana2_rls_empleado307.png)
+![RLS con empleado\_307](./imagenes/Captura%20de%20pantalla%202026-06-22%20194628.png)
 
 ---
 
@@ -510,7 +504,7 @@ ORDER BY table_schema, table_name;
 
 ## Evidencia
 
-![Listado de vistas seguras](imagenes/semana2_vistas_seguras.png)
+![Listado de vistas seguras](./imagenes/Captura%20de%20pantalla%202026-06-22%20194710.png)
 
 ---
 
@@ -525,10 +519,6 @@ SELECT *
 FROM clientes.vw_dispositivos_seguros
 LIMIT 5;
 ```
-
-## Evidencia
-
-![Vista dispositivos seguros](imagenes/semana2_vista_dispositivos_seguros.png)
 
 ---
 
@@ -550,7 +540,7 @@ LIMIT 5;
 
 ## Evidencia
 
-![Usuario consulta vista segura](imagenes/semana2_usuario_consulta_vista.png)
+![Usuario consulta vista segura](./imagenes/Captura%20de%20pantalla%202026-06-22%20195410.png)
 
 ---
 
@@ -578,7 +568,7 @@ ERROR: permission denied for schema clientes
 
 ## Evidencia
 
-![Usuario sin acceso directo a tabla base](imagenes/semana2_vista_acceso_directo_denegado.png)
+![Usuario sin acceso directo a tabla base](./imagenes/Captura%20de%20pantalla%202026-06-22%20195425.png)
 
 ---
 
@@ -745,34 +735,6 @@ GRANT SELECT ON clientes.vw_dispositivos_seguros TO analyst_role;
 | Script SQL reproducible                 | Aplicado/Pendiente de subir   | Archivo `scripts/semana2_control_acceso.sql`. |
 | Matriz rol → objeto → permiso           | Aplicado                      | Matriz documentada en este archivo.           |
 
----
-
-# Estructura recomendada para GitHub
-
-```text
-tbd4_viva/
-├── 10-documentacion-tecnica/
-│   ├── semana_1_hardening.md
-│   ├── semana_2_control_acceso.md
-│   └── imagenes/
-│       ├── semana2_esquemas.png
-│       ├── semana2_tablas_por_esquema.png
-│       ├── semana2_matriz_privilegios.png
-│       ├── semana2_seguridad_columna_grant.png
-│       ├── semana2_seguridad_columna_prueba.png
-│       ├── semana2_rls_policies.png
-│       ├── semana2_usuario_linea.png
-│       ├── semana2_rls_empleado306.png
-│       ├── semana2_rls_empleado307.png
-│       ├── semana2_vistas_seguras.png
-│       ├── semana2_vista_dispositivos_seguros.png
-│       ├── semana2_usuario_consulta_vista.png
-│       ├── semana2_vista_acceso_directo_denegado.png
-│       ├── semana2_script_sql.png
-│       └── semana2_matriz_documentada.png
-└── scripts/
-    └── semana2_control_acceso.sql
-```
 
 ---
 
