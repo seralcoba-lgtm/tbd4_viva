@@ -186,43 +186,25 @@ DB_PASSWORD=contraseña_local
 
 ---
 
-## 9. Archivos que no deben subirse al repositorio
 
-Por seguridad y buenas prácticas, este repositorio no debe incluir:
-
-```text
-.env
-vendor/
-node_modules/
-storage/logs/
-*.sql
-*.backup
-*.tar.gz
-*.zip
-```
-
-Estos archivos pueden contener credenciales, datos sensibles, dependencias pesadas o respaldos de base de datos.
-
----
-
-## 10. Instalación del proyecto en otro entorno
+## 9. Instalación del proyecto en otro entorno
 
 Para ejecutar el proyecto en otro equipo, se deben seguir estos pasos generales:
 
-### 10.1. Clonar el repositorio
+### 9.1. Clonar el repositorio
 
 ```bash
 git clone URL_DEL_REPOSITORIO
 cd viva-gui
 ```
 
-### 10.2. Instalar dependencias PHP
+### 9.2. Instalar dependencias PHP
 
 ```bash
 composer install
 ```
 
-### 10.3. Crear archivo de entorno
+### 9.3. Crear archivo de entorno
 
 ```bash
 cp .env.example .env
@@ -234,23 +216,23 @@ En Windows PowerShell:
 copy .env.example .env
 ```
 
-### 10.4. Configurar la conexión a PostgreSQL
+### 9.4. Configurar la conexión a PostgreSQL
 
 Editar el archivo `.env` y colocar los datos reales de conexión a la base de datos.
 
-### 10.5. Generar la llave de Laravel
+### 9.5. Generar la llave de Laravel
 
 ```bash
 php artisan key:generate
 ```
 
-### 10.6. Ejecutar migraciones, si corresponde
+### 9.6. Ejecutar migraciones, si corresponde
 
 ```bash
 php artisan migrate
 ```
 
-### 10.7. Levantar el servidor local
+### 9.7. Levantar el servidor local
 
 ```bash
 php artisan serve
@@ -264,7 +246,7 @@ http://127.0.0.1:8000
 
 ---
 
-## 11. Aspectos defendidos en la exposición
+## 10. Aspectos defendidos en la exposición
 
 En la defensa del proyecto se explicó:
 
@@ -278,7 +260,7 @@ En la defensa del proyecto se explicó:
 
 ---
 
-## 12. Conclusión
+## 11. Conclusión
 
 La GUI desarrollada permite administrar módulos importantes del sistema Viva mediante una interfaz web clara y funcional.  
 Laravel aporta la estructura del proyecto, Filament facilita la creación de pantallas CRUD y PostgreSQL mantiene la seguridad, organización y persistencia de los datos.
